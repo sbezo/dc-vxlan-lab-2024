@@ -1,4 +1,5 @@
-<img width="858" alt="image" src="https://github.com/user-attachments/assets/d6a3b91a-d820-42d9-9839-d5bd836722c3">
+<img width="852" alt="image" src="https://github.com/user-attachments/assets/87cc90f9-e2e6-467d-9967-8e2ca45f0ad7">
+
 
 # Manual configuration
 EVPN BGP VXLAN fabric was manually configured on Nexus 9300V virtual switches via:
