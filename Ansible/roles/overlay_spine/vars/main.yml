@@ -1,0 +1,8 @@
+features:
+- { feature: bgp }
+- { feature: nv overlay }
+
+bgp_neighbors:
+- { neighbor: 192.168.0.3 }
+- { neighbor: 192.168.0.4 }
+- { neighbor: 192.168.0.5 }

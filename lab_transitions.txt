@@ -1,0 +1,7 @@
+# boot to final.cfg:
+copy booflash:/final.cfg start
+reload
+
+# boot to underlay-only.cfg:
+copy booflash:/underlay-only.cfg start
+reload

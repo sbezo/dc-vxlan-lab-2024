@@ -1,0 +1,19 @@
+# setup IP
+vi /etc/network/interfaces
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+
+auto eth1
+iface eth1 inte static
+  address 10.116.20.103/24
+  up ip route add 10.116.0.0/16 via 10.116.20.1
+
+
+service networking restart
+
+# setup hostname
+hostname A3

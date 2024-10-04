@@ -1,0 +1,32 @@
+
+# L1 - L3
+no interface Vlan20
+no interface Vlan10
+no ip igmp snooping vxlan
+no router bgp 65999
+no interface nve1
+no interface Vlan999
+no vrf context L3VNI
+no vlan 999
+default interface Ethernet1/3
+no vlan 20
+no vlan 10
+no nv overlay evpn
+no feature bgp
+no feature fabric forwarding
+no feature interface-vlan
+no feature vn-segment-vlan-based
+no feature nv overlay
+
+copy running-config booflash:/underlay-only.cfg
+
+# S1 - S2
+no router bgp 65999
+no feature bgp
+no feature fabric forwarding
+no feature interface-vlan
+no feature vn-segment-vlan-based
+no feature nv overlay
+
+copy running-config booflash:/underlay-only.cfg
+

@@ -1,0 +1,37 @@
+# zaujmave je bezat ansible z kontajnera:
+alias ansible="docker run -ti --rm -v ~/.ssh:/root/.ssh -v ~/.aws:/root/.aws -v $(pwd):/apps -w /apps alpine/ansible ansible"
+alias ansible-playbook=" docker run -ti --rm -v ~/.ssh:/root/.ssh -v ~/.aws:/root/.aws -v $(pwd):/apps -w /apps alpine/ansible ansible-playbook"
+# ak su zapnute aliasy, tak nefunguje python ansible! - v tomto kontajnerovom nejde SSH cez meno/heslo!
+
+
+# alebo potom standartne instalovat v python .venv
+python3 -m venv .venv
+source .venv/bin/activate
+pip3 install ansible
+pip3 install ansible-vault
+brew install libssh
+brew install sshpass
+export PATH=$PATH:/opt/homebrew/bin/sshpass
+CFLAGS="-I $(brew --prefix)/include -I ext -L $(brew --prefix)/lib -lssh" pip install ansible-pylibssh
+
+# vylistvanie inventory s nacitanymi premennymi:
+ansible-inventory -i inventories/staging/hosts.yml --list --yaml --ask-vault-pass
+
+# praca so zakryptovanymi subormi:
+ansible-vault encrypt group_vars/alpines.yml
+ansible-vault view group_vars/alpines.yml
+ansible-vault edit group_vars/alpines.yml
+ansible-vault decrypt group_vars/alpines.yml
+
+#praca so zakryptovanymi stringami:
+ansible-vault encrypt_string thisispassword --ask-vault-pass
+# copy + paste to file insteda plaintext 'thisispassword'
+
+# demo playbook
+ansible-playbook -i inventories/staging/hosts.yml playbooks/demo-playbook-alpine.yml --ask-vault-pass
+
+# full stack site playbook:
+ansible-playbook -i inventories/staging/hosts.yml --ask-vault-password site.yml
+
+# run site playbook from task:
+ansible-playbook -i inventories/staging/hosts.yml --ask-vault-password site.yml --limit L1 --start-at-task "DEFINE VLANs"

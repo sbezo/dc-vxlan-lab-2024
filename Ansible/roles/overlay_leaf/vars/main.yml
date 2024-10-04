@@ -1,0 +1,14 @@
+  features:
+  - { feature: bgp }
+  - { feature: fabric forwarding }
+  - { feature: interface-vlan }
+  - { feature: vn-segment-vlan-based }
+  - { feature: "nv overlay" }
+
+  vni:
+  - { vni: 10010, group: 239.0.0.1 }
+  - { vni: 10020, group: 239.0.0.2 }
+
+  bgp_neighbors:
+  - { neighbor: 192.168.0.1 }
+  - { neighbor: 192.168.0.2 }

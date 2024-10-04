@@ -1,0 +1,26 @@
+nv overlay evpn
+feature bgp
+feature nv overlay
+
+router bgp 65999
+  log-neighbor-changes
+  address-family ipv4 unicast
+  address-family l2vpn evpn
+    retain route-target all
+  template peer VXLAN_LEAF
+    remote-as 65999
+    update-source loopback0
+    address-family ipv4 unicast
+      send-community extended
+      route-reflector-client
+      soft-reconfiguration inbound
+    address-family l2vpn evpn
+      send-community
+      send-community extended
+      route-reflector-client
+  neighbor 192.168.0.3
+    inherit peer VXLAN_LEAF
+  neighbor 192.168.0.4
+    inherit peer VXLAN_LEAF
+  neighbor 192.168.0.5
+    inherit peer VXLAN_LEAF

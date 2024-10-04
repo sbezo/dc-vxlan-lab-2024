@@ -1,0 +1,119 @@
+feature nv overlay
+interface nve1
+  no shutdown
+  host-reachability protocol bgp
+  source-interface loopback0
+
+nv overlay evpn
+feature bgp
+feature fabric forwarding
+feature interface-vlan
+feature vn-segment-vlan-based
+
+
+router bgp 65999
+  log-neighbor-changes
+  address-family ipv4 unicast
+  address-family l2vpn evpn
+  template peer VXLAN_SPINE
+    remote-as 65999
+    update-source loopback0
+    address-family ipv4 unicast
+      send-community extended
+      soft-reconfiguration inbound
+    address-family l2vpn evpn
+      send-community
+      send-community extended
+  neighbor 192.168.0.1
+    inherit peer VXLAN_SPINE
+  neighbor 192.168.0.2
+    inherit peer VXLAN_SPINE
+
+!--- vni
+hardware access-list tcam region vpc-convergence 0
+!--- +reload
+
+fabric forwarding anycast-gateway-mac aaaa.bbbb.0001
+
+!--- vlan 10 + L3 interface
+vlan 10
+ vn-segment 10010
+interface Vlan10
+  no shutdown
+  ip address 10.116.10.1/24
+  fabric forwarding mode anycast-gateway
+
+interface nve1
+  member vni 10010
+    suppress-arp
+    mcast-group 239.0.0.1
+
+evpn
+  vni 10010 l2
+    rd auto
+    route-target import auto
+    route-target export auto
+
+!--- vlan 20 + L3 interface
+vlan 20
+ vn-segment 10020
+interface Vlan20
+  no shutdown
+  ip address 10.116.20.1/24
+  fabric forwarding mode anycast-gateway
+
+interface nve1
+  member vni 10020
+    suppress-arp
+    mcast-group 239.0.0.2
+
+evpn
+  vni 10020 l2
+    rd auto
+    route-target import auto
+    route-target export auto
+
+# access ports
+interface Ethernet1/3
+  switchport access vlan 20
+  descr A3
+
+# VNIL3 routing
+vlan 999
+  vn-segment 10999
+
+vrf context L3VNI
+  vni 10999
+  rd auto
+  address-family ipv4 unicast
+    route-target both auto
+    route-target both auto evpn
+
+interface Vlan999
+  no shutdown
+  vrf member L3VNI
+  ip forward
+
+interface nve1
+  !
+  member vni 10999 associate-vrf
+
+router bgp 65999
+  vrf L3VNI
+    log-neighbor-changes
+    address-family ipv4 unicast
+      network 10.116.10.0/24
+      network 10.116.20.0/24
+
+ip igmp snooping vxlan
+
+!--- treba prehodit VLAN SVI do novrj vfr
+
+interface Vlan10
+  vrf member L3VNI
+  ip address 10.116.10.1/24
+  fabric forwarding mode anycast-gateway
+interface Vlan20
+  vrf member L3VNI
+  ip address 10.116.20.1/24
+  fabric forwarding mode anycast-gateway

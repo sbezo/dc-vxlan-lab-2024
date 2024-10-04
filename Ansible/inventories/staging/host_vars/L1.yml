@@ -1,0 +1,6 @@
+VLANs:
+- { vlan: 10, vni: 10010, svi: 10.116.10.1/24, network: 10.116.10.0/24 }
+- { vlan: 20, vni: 10020, svi: 10.116.20.1/24, network: 10.116.20.0/24 }
+
+Interfaces:
+- { interface: Ethernet1/3, vlan: 10, description: A1 }

@@ -1,0 +1,11 @@
+---
+- name: Demo-playbook-II
+
+  hosts: switches
+  tasks:
+    - name: run show version command
+      cisco.nxos.nxos_command:
+        commands:
+          - show version
+      register: output_result
+    - debug: var=output_result.stdout_lines

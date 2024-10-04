@@ -1,0 +1,59 @@
+- name: DEFINE VLANs
+  cisco.nxos.nxos_vlans:
+    config:
+      - vlan_id: "{{ item.vlan }}"
+        enabled: true
+        mapped_vni: "{{ item.vni }}"
+  with_items: "{{ VLANs }}"
+
+- name: Set SVI
+  cisco.nxos.nxos_l3_interfaces:
+    config:
+      - name: "VLAN{{ item.vlan }}"
+        ipv4:
+          - address: "{{ item.svi }}"
+  with_items: "{{ VLANs }}"
+
+- name: Set L3SVI VRF for SVI
+  cisco.nxos.nxos_vrf_interface:
+    vrf: L3VNI
+    interface: "VLAN{{ item.vlan }}"
+  with_items: "{{ VLANs }}"
+
+- name: Set SVI
+  cisco.nxos.nxos_l3_interfaces:
+    config:
+      - name: "VLAN{{ item.vlan }}"
+        ipv4:
+          - address: "{{ item.svi }}"
+  with_items: "{{ VLANs }}"
+
+- name: Set another parameters for SVIs
+  cisco.nxos.nxos_config:
+    lines:
+      - fabric forwarding mode anycast-gateway
+      - no shutdown
+    parents: "interface VLAN{{ item.vlan }}"
+  with_items: "{{ VLANs }}"
+
+- name: CONFIGURE BGP Networks
+  cisco.nxos.nxos_bgp_address_family:
+    config:
+      as_number: "{{ ASN }}"
+      address_family:
+        - afi: ipv4
+          safi: unicast
+          networks:
+            - prefix: "{{ item.network }}"
+          vrf: L3VNI
+          advertise_l2vpn_evpn: true
+  with_items: "{{ VLANs }}"
+
+- name: Configure Access Ports
+  cisco.nxos.nxos_l2_interfaces:
+    config:
+      - name: "{{ item.interface }}"
+        access:
+          vlan: "{{ item.vlan }}"
+    state: overridden
+  with_items: "{{ Interfaces }}"

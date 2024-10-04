@@ -1,0 +1,15 @@
+---
+- name: VXLAN overlay network to spines
+  hosts: spines
+  roles:
+    - role: overlay_spine
+
+- name: VXLAN overlay network to leaves
+  hosts: leaves
+  roles:
+    - role: overlay_leaf
+
+- name: Configure VLANs and Ports in VXLAN fabric
+  hosts: leaves
+  roles:
+    - role: leafe_vlans_and_ports

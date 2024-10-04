@@ -1,0 +1,42 @@
+!--- L1
+interface e1/1
+ no switchport
+ mac-address 0094.7e3a.1b08
+ no mac-address 0094.7e3a.1b08
+ ip address 192.168.10.1/31
+ mtu 9216
+ no shut
+interface e1/2
+ no switchport
+ mac-address 0094.7e3a.1b08
+ no mac-address 0094.7e3a.1b08
+ ip address 192.168.10.7/31
+ mtu 9216
+ no shut
+
+
+interface loopback 0
+ ip address 192.168.0.3/32
+
+feature ospf
+
+router ospf OSPF_UNDERLAY
+  log-adjacency-changes
+
+interface loopback 0
+ ip router ospf OSPF_UNDERLAY area 0.0.0.0
+
+interface Ethernet1/1-2
+  medium p2p
+  ip router ospf OSPF_UNDERLAY area 0.0.0.0
+
+!--- multicast
+feature pim
+
+ip pim rp-address 192.168.0.255
+
+interface loopback0
+  ip pim sparse-mode
+
+interface Ethernet1/1-2
+  ip pim sparse-mode
